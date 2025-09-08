@@ -1,11 +1,5 @@
-
 ````markdown
-# 🛒 CGM E-commerce Backend
-
-This is a **Spring Boot** backend for an e-commerce application with partial multi-tenancy support, implemented as part of a technical assignment for **Lead Software Architect (SAP Commerce Cloud)** interview at CGM.
-https://cgm.wd3.myworkdayjobs.com/de-DE/cgm/job/Lead-Software-Architect--m-f-d-_JR107374
-
----
+# 🛒 E-commerce Backend
 
 ## ⚙️ Features
 
@@ -102,6 +96,11 @@ mvn verify          # Run full build verification (all pass ✅)
 
 
 
+
+
+This is a **Spring Boot** backend for an e-commerce application with partial multi-tenancy support, 
+implemented as part of a technical assignment for **Lead Software Architect (SAP Commerce Cloud)** interview at CGM.
+https://cgm.wd3.myworkdayjobs.com/de-DE/cgm/job/Lead-Software-Architect--m-f-d-_JR107374
 
 
 **Technical Assignment**
