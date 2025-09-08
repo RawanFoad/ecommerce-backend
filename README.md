@@ -51,3 +51,57 @@ III. Deliverables
 ● Source code (GitHub/GitLab repository).
 ● Short architecture/design documentation.
 ● Instructions to run the application (preferably via Docker or ./mvn spring-boot:run).
+
+
+
+
+
+**Architecture / Design Documentation**
+1. Overall Architecture
+This project is a Spring Boot application implementing an e-commerce backend. It follows a layered architecture with multi-tenancy support.
+
+[DONE]            -Controller layer: Handles incoming REST API requests, validates input, and delegates work to services.
+[DONE]            -Service layer: Contains the business logic. Services orchestrate between repositories, mappers, and external systems. DTO and Domain mapping usually happens here.
+[DONE]            -Repository layer (DAO): Interfaces extending Spring Data JPA’s JpaRepository to interact with the database.
+[DONE]            -Domain layer: Contains JPA entities that map directly to database tables.
+[DONE]            -DTO layer: Data Transfer Objects exposed to the outside world (used in controllers and API responses).
+[DONE]            -Mapper layer: Converts between Domain objects (Entities) and DTOs.
+[STARTED/NOT DONE]-Configuration: MultiTenancyConfig: Configures tenant-based schema separation.
+[STARTED/NOT DONE]-Flyway: Manages database schema migrations via src/main/resources/db/migration.
+
+2. Technology Stack
+                    Java 17+
+                    Spring Boot 3.3.1
+                    Spring Data JPA (Hibernate 6.x)
+                    Flyway for database migrations
+[STARTED/NOT DONE]  H2 / PostgreSQL / MySQL (depending on profile)
+                    Maven for build
+                    JUnit 5 + Mockito for testing
+[NOT USED]          Docker for containerization
+
+3. Key Features
+                    Product management (CRUD with DTO ↔ Entity mapping)
+                    Order and order-item tracking
+                    "Frequently Bought Together" recommendation service
+[STARTED/NOT DONE]  Multi-tenant support (each tenant has its own schema)
+[STARTED/NOT DONE]  Flyway-based DB migrations
+
+
+
+
+
+**Instructions to Run the Application**
+Run Locally with Maven
+Make sure you have:
+Java 17+ installed (java -version)
+Maven 3.9+ installed (mvn -v)
+
+Steps:
+# Clone the repository
+git clone https://github.com/<your-username>/ecommerce-backend.git
+cd ecommerce-backend
+
+# Run with Maven
+./mvnw spring-boot:run
+
+The app will start at: http://localhost:8080
