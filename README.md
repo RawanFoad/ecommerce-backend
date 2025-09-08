@@ -1,4 +1,13 @@
-Technical Assignment
+**Outline:**
+-Technical Assignment
+-Architecture / Design Documentation
+-Instructions to Run the Application
+
+
+
+
+
+**Technical Assignment**
 
 I. Context
 You are tasked with designing and implementing a simplified e-commerce platform backend using the Spring Framework stack. The solution should demonstrate clean
