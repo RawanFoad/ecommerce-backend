@@ -1,7 +1,104 @@
-**Outline:**
--Technical Assignment
--Architecture / Design Documentation
--Instructions to Run the Application
+
+````markdown
+# 🛒 CGM E-commerce Backend
+
+This is a **Spring Boot** backend for an e-commerce application with partial multi-tenancy support, implemented as part of a technical assignment for **Lead Software Architect (SAP Commerce Cloud)** interview at CGM.
+https://cgm.wd3.myworkdayjobs.com/de-DE/cgm/job/Lead-Software-Architect--m-f-d-_JR107374
+
+---
+
+## ⚙️ Features
+
+- Core **Product**, **Order**, **Customer**, and **Frequently Bought Together** services
+- **DTO & Domain mapping**
+- Partial **multi-tenancy** support
+- Comprehensive **unit tests** (`mvn test` ✅)
+- Designed for **PostgreSQL** database
+
+---
+
+## 📐 Architecture Overview
+
+```text
+   ┌──────────────┐         ┌───────────────┐
+   │   Controller │────────>│   Service      │
+   └──────────────┘         └───────────────┘
+                                 │
+                                 ▼
+                        ┌────────────────┐
+                        │ Repository /   │
+                        │ JPA / Hibernate│
+                        └────────────────┘
+                                 │
+                                 ▼
+                        ┌────────────────┐
+                        │   PostgreSQL    │
+                        └────────────────┘
+````
+
+* Controllers handle **HTTP requests**.
+* Services contain **business logic**, including DTO mapping.
+* Repositories interact with **JPA/Hibernate**.
+* Multi-tenancy partially implemented at **Service/Repository** level.
+
+---
+
+## 🏃 Running the Application
+
+> **Important:** The application currently **requires a PostgreSQL database**. `mvn spring-boot:run` **will fail** without it.
+
+1. Configure PostgreSQL locally.
+2. Update `src/main/resources/application.properties`:
+
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/ecommerce
+spring.datasource.username=your_user
+spring.datasource.password=your_password
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.flyway.enabled=true
+spring.flyway.locations=classpath:db/migration
+```
+
+3. Run with Maven:
+
+```
+mvn spring-boot:run
+```
+
+**Without database:**
+
+* Application startup will fail (`Could not obtain connection to query metadata`)
+* Unit tests and `mvn verify` **still work**.
+
+---
+
+## 🧪 Build & Test
+
+```
+mvn clean install   # Compile & package
+mvn test            # Run unit tests (all pass ✅)
+mvn verify          # Run full build verification (all pass ✅)
+```
+
+---
+
+## ⚠️ Known Limitations
+
+* **Multi-tenancy**: partially implemented, not fully tested with multiple schemas
+* **Docker support**: Not included
+* **Database connection**: Required for full application startup
+
+---
+
+## 🎯 Summary
+
+* ✅ Fully functional **unit-tested backend**
+* ⚠️ Database connection required for running
+* ⚠️ Multi-tenancy & Docker: work in progress
+
+---
 
 
 
