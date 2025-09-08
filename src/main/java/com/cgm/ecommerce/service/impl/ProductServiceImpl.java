@@ -48,8 +48,8 @@ public class ProductServiceImpl implements ProductService {
         return ProductMapper.toDto(repository.save(product));
     }
 
-    public void deleteProduct(Long id) {
-        if (!repository.existsById(id)) {
+    public void deleteProduct(Long id, String tenantId) {
+        if (!repository.existsByIdAndTenantId(id, tenantId)) {
             throw new NoSuchElementException("Product not found with id " + id);
         }
 

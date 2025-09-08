@@ -33,8 +33,8 @@ class FrequentlyBoughtTogetherControllerTest {
     @Test
     void testGetFrequentlyBoughtTogether() throws Exception {
         // Arrange: create mock response
-        ProductDto p1 = new ProductDto(2L, "Phone Case", "Protective case", new BigDecimal("19.99"));
-        ProductDto p2 = new ProductDto(3L, "Screen Protector", "Tempered glass", new BigDecimal("9.99"));
+        ProductDto p1 = new ProductDto(2L, "Phone Case", "Protective case", new BigDecimal("19.99"), "tenant1");
+        ProductDto p2 = new ProductDto(3L, "Screen Protector", "Tempered glass", new BigDecimal("9.99"), "tenant1");
         FrequentlyBoughtTogetherDto mockDto =
                 new FrequentlyBoughtTogetherDto(1L, List.of(p1, p2));
 

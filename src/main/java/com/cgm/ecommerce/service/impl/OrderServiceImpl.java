@@ -46,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
 
         // Validate stock and deduct
         for (OrderItemDto itemDto : orderDto.getItems()) {
-            Product product = productRepository.findById(itemDto.getProductId())
+            Product product = productRepository.findByIdAndTenantId(itemDto.getProductId(), tenantId)
                     .orElseThrow(() -> new RuntimeException("Product not found"));
 
             if (product.getPrice() == null) throw new RuntimeException("Product price missing");

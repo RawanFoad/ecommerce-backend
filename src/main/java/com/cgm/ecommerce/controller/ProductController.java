@@ -35,8 +35,8 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ProductDto getById(@PathVariable Long id) {
-        return service.getProductById(id);
+    public ProductDto getById(@PathVariable Long id, @RequestParam String tenantId) {
+        return service.getProductById(id, tenantId);
     }
 
     @PutMapping("/{id}")
@@ -45,7 +45,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        service.deleteProduct(id);
+    public void delete(@PathVariable Long id, @RequestParam String tenantId) {
+        service.deleteProduct(id, tenantId);
     }
 }

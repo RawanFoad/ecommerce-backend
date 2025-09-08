@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +30,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceImplTest {
-
     @Mock
     private OrderRepository orderRepository;
 
@@ -42,29 +42,31 @@ public class OrderServiceImplTest {
     @InjectMocks
     private OrderServiceImpl orderService;
 
+    private Customer customer;
+    private Product product;
+    private Order order;
+    private String tenantId = "tenant1";
+
     @Test
     void testCreateOrder_Success() {
-        String tenantId = "tenant1";
-
         Customer customer = new Customer();
         customer.setId(1L);
 
-        Product product = new Product();
+        product = new Product();
         product.setId(1L);
-        product.setPrice(new BigDecimal("10.0"));
-        product.setStockQuantity(5);
-        product.setTenantId(tenantId);
+        product.setPrice(BigDecimal.valueOf(1200));
+        product.setStockQuantity(4);
 
         OrderItemDto itemDto = new OrderItemDto();
         itemDto.setProductId(1L);
-        itemDto.setQuantity(2);
+        itemDto.setQuantity(1);
 
         OrderDto orderDto = new OrderDto();
         orderDto.setCustomerId(1L);
         orderDto.setItems(List.of(itemDto));
 
         when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
-        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(productRepository.findByIdAndTenantId(1L, tenantId)).thenReturn(Optional.of(product));
         when(productRepository.save(any(Product.class))).thenAnswer(inv -> inv.getArgument(0));
         when(orderRepository.save(any(Order.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -75,6 +77,34 @@ public class OrderServiceImplTest {
         assertEquals(1, created.getItems().size());
         assertEquals(3, product.getStockQuantity()); // 5 - 2
         verify(orderRepository, times(1)).save(any(Order.class));
+    }
+
+    @Test
+    void testCreateOrder_InsufficientStockProduct() {
+        Customer customer = new Customer();
+        customer.setId(1L);
+
+        product = new Product();
+        product.setId(1L);
+        product.setName("Smart Phone");
+        product.setPrice(BigDecimal.valueOf(1200));
+        product.setStockQuantity(4);
+
+        OrderItemDto itemDto = new OrderItemDto();
+        itemDto.setProductId(1L);
+        itemDto.setQuantity(5);
+
+        OrderDto orderDto = new OrderDto();
+        orderDto.setCustomerId(1L);
+        orderDto.setItems(List.of(itemDto));
+
+        when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+        when(productRepository.findByIdAndTenantId(1L, tenantId)).thenReturn(Optional.of(product));
+
+        RuntimeException ex = assertThrows(RuntimeException.class,
+                () -> orderService.createOrder(orderDto, "tenant1"));
+
+        assertEquals("Insufficient stock for product: Smart Phone", ex.getMessage());
     }
 
     @Test
@@ -104,7 +134,7 @@ public class OrderServiceImplTest {
         orderDto.setItems(List.of(itemDto));
 
         when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
-        when(productRepository.findById(99L)).thenReturn(Optional.empty());
+        when(productRepository.findByIdAndTenantId(99L, tenantId)).thenReturn(Optional.empty());
 
         RuntimeException ex = assertThrows(RuntimeException.class,
                 () -> orderService.createOrder(orderDto, "tenant1"));
@@ -114,8 +144,6 @@ public class OrderServiceImplTest {
 
     @Test
     void testGetAllOrders() {
-        String tenantId = "tenant1";
-
         Order order = new Order();
         order.setId(1L);
         order.setTenantId(tenantId);
@@ -131,9 +159,10 @@ public class OrderServiceImplTest {
 
     @Test
     void testGetOrderById_Found() {
-        Order order = new Order();
+        order = new Order();
         order.setId(1L);
-        order.setItems(new ArrayList<>());
+        order.setCustomer(customer);
+        order.setCreatedAt(LocalDateTime.of(2024, 1, 1, 12, 0));
 
         when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
 

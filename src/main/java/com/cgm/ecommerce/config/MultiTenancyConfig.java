@@ -1,7 +1,7 @@
 package com.cgm.ecommerce.config;
 
-import org.hibernate.cfg.Environment;
-import org.hibernate.MultiTenancyStrategy;
+//import org.hibernate.cfg.Environment;
+//import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
 import org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy;
@@ -50,10 +50,10 @@ public class MultiTenancyConfig {
         emf.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 
         Map<String, Object> props = new HashMap<>();
-        props.put(org.hibernate.cfg.AvailableSettings.MULTI_TENANT, MultiTenancyStrategy.SCHEMA);
+        //props.put(org.hibernate.cfg.AvailableSettings.MULTI_TENANT, MultiTenancyStrategy.SCHEMA);
         props.put(org.hibernate.cfg.AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER, multiTenantConnectionProvider);
         props.put(org.hibernate.cfg.AvailableSettings.MULTI_TENANT_IDENTIFIER_RESOLVER, tenantIdentifierResolver);
-        props.put("hibernate.physical_naming_strategy", SpringPhysicalNamingStrategy.class.getName());
+        //props.put("hibernate.physical_naming_strategy", SpringPhysicalNamingStrategy.class.getName());
         props.put("hibernate.implicit_naming_strategy", SpringImplicitNamingStrategy.class.getName());
 
         emf.setJpaPropertyMap(props);

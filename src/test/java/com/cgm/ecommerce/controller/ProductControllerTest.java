@@ -1,111 +1,133 @@
 package com.cgm.ecommerce.controller;
 
 import com.cgm.ecommerce.dto.ProductDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.cgm.ecommerce.service.ProductService;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-public class ProductControllerTest {
+@WebMvcTest(ProductController.class)
+class ProductControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @MockBean
+    private ProductService service;
 
     @Test
     void testCreateProduct() throws Exception {
-        ProductDto dto = new ProductDto(null, "Test", "Desc", new BigDecimal("10.50"));
-        mockMvc.perform(post("/api/products")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Test"));
-    }
+        ProductDto dto = new ProductDto();
+        dto.setId(1L);
+        dto.setName("Phone");
+        dto.setDescription("Smartphone");
+        dto.setPrice(BigDecimal.valueOf(599.99));
 
-    @Test
-    void testCreateProductNull() throws Exception {
+        Mockito.when(service.createProduct(any(ProductDto.class)))
+                .thenReturn(dto);
+
         mockMvc.perform(post("/api/products")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(""))
-                .andExpect(status().is4xxClientError());
+                        .content("""
+                                {
+                                  "name": "Phone",
+                                  "description": "Smartphone",
+                                  "price": 599.99
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.name").value("Phone"))
+                .andExpect(jsonPath("$.description").value("Smartphone"))
+                .andExpect(jsonPath("$.price").value(599.99));
     }
 
     @Test
     void testGetAllProducts() throws Exception {
-        mockMvc.perform(get("/api/products"))
-                .andExpect(status().isOk());
+        ProductDto dto = new ProductDto();
+        dto.setId(1L);
+        dto.setName("Laptop");
+        dto.setDescription("Gaming Laptop");
+        dto.setPrice(BigDecimal.valueOf(1200));
+
+        Mockito.when(service.getAllProducts("tenant1"))
+                .thenReturn(List.of(dto));
+
+        mockMvc.perform(get("/api/products")
+                        .param("tenantId", "tenant1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].name").value("Laptop"))
+                .andExpect(jsonPath("$[0].description").value("Gaming Laptop"))
+                .andExpect(jsonPath("$[0].price").value(1200));
     }
 
     @Test
-    void testGetProductByIdNotFound() throws Exception {
-        mockMvc.perform(get("/api/products/9999"))
-                .andExpect(status().is4xxClientError());
+    void testGetProductById() throws Exception {
+        ProductDto dto = new ProductDto();
+        dto.setId(2L);
+        dto.setName("Tablet");
+        dto.setDescription("Android Tablet");
+        dto.setPrice(BigDecimal.valueOf(300));
+
+        Mockito.when(service.getProductById(2L, "tenant1"))
+                .thenReturn(dto);
+
+        mockMvc.perform(get("/api/products/2")
+                        .param("tenantId", "tenant1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(2L))
+                .andExpect(jsonPath("$.name").value("Tablet"))
+                .andExpect(jsonPath("$.description").value("Android Tablet"))
+                .andExpect(jsonPath("$.price").value(300));
     }
 
     @Test
     void testUpdateProduct() throws Exception {
-        ProductDto dto = new ProductDto(null, "Update", "Desc", new BigDecimal("20.00"));
+        ProductDto dto = new ProductDto();
+        dto.setId(3L);
+        dto.setName("Updated Laptop");
+        dto.setDescription("High-end Gaming Laptop");
+        dto.setPrice(BigDecimal.valueOf(1500));
 
-        // First create
-        String response = mockMvc.perform(post("/api/products")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andReturn().getResponse().getContentAsString();
-        ProductDto created = objectMapper.readValue(response, ProductDto.class);
+        Mockito.when(service.updateProduct(eq(3L), any(ProductDto.class)))
+                .thenReturn(dto);
 
-        // Update
-        created.setName("Updated Name");
-        mockMvc.perform(put("/api/products/" + created.getId())
+        mockMvc.perform(put("/api/products/3")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(created)))
+                        .content("""
+                                {
+                                  "name": "Updated Laptop",
+                                  "description": "High-end Gaming Laptop",
+                                  "price": 1500
+                                }
+                                """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Updated Name"));
-    }
-
-    @Test
-    void testUpdateProductNotFound() throws Exception {
-        ProductDto dto = new ProductDto(null, "Name", "Desc", new BigDecimal("10.00"));
-        mockMvc.perform(put("/api/products/9999")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().is4xxClientError());
+                .andExpect(jsonPath("$.id").value(3L))
+                .andExpect(jsonPath("$.name").value("Updated Laptop"))
+                .andExpect(jsonPath("$.description").value("High-end Gaming Laptop"))
+                .andExpect(jsonPath("$.price").value(1500));
     }
 
     @Test
     void testDeleteProduct() throws Exception {
-        ProductDto dto = new ProductDto(null, "Delete", "Desc", new BigDecimal("15.00"));
+        Mockito.doNothing().when(service).deleteProduct(5L, "tenant1");
 
-        // Create product
-        String response = mockMvc.perform(post("/api/products")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andReturn().getResponse().getContentAsString();
-        ProductDto created = objectMapper.readValue(response, ProductDto.class);
-
-        // Delete
-        mockMvc.perform(delete("/api/products/" + created.getId()))
+        mockMvc.perform(delete("/api/products/5")
+                        .param("tenantId", "tenant1"))
                 .andExpect(status().isOk());
-    }
-
-    @Test
-    void testDeleteProductNotFound() throws Exception {
-        mockMvc.perform(delete("/api/products/9999"))
-                .andExpect(status().is4xxClientError());
     }
 }

@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public class ProductDto {
     public Long id;
-    public String tenantId;//TODO not needed
+    public String tenantId;
     public String sku;//TODO not needed
     public String name;
     public String description;
@@ -13,11 +13,12 @@ public class ProductDto {
 
     public ProductDto() {}
 
-    public ProductDto(Long id, String name, String description, BigDecimal price) {
+    public ProductDto(Long id, String name, String description, BigDecimal price, String tenantId) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
+        this.tenantId = tenantId;
     }
 
     public Long getId() {

@@ -11,7 +11,9 @@ public class OrderMapper {
         if (order == null) return null;
         OrderDto dto = new OrderDto();
         dto.setId(order.getId());
-        dto.setCustomerId(order.getCustomer().getId());
+        if (order.getCustomer() != null) {
+            dto.setCustomerId(order.getCustomer().getId());
+        }
         dto.setCreatedAt(order.getCreatedAt());
         List<OrderItemDto> items = order.getItems().stream().map(item -> {
             OrderItemDto i = new OrderItemDto();
